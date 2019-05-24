@@ -1,0 +1,18 @@
+## Sample Resource policy
+
+{
+"Statement": [
+{
+"Effect": "Allow",
+"Principal": "*",
+"Action": "execute-api:Invoke",
+"Resource": "arn:aws:execute-api:us-west-1:111122223333:myapi/*"
+},
+
+{
+"Effect": "Deny",
+"Principal": "*",
+"Action": "execute-api:Invoke",
+"Resource": "arn:aws:execute-api:us-west-1:111122223333:myapi/*",
+"Condition" : { "IpAddress": { "aws:SourceIp": ["54.12.0.0/16", "91.128.100.17/32" ] } } }
+}

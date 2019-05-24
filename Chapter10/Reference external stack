@@ -1,0 +1,8 @@
+{
+   "Transform" : {
+       "Name" : "AWS::Include",
+       "Parameters" : {
+           "Location" : "s3://cftemplatebucket/simple-network-stack.json"
+        }
+    }
+}

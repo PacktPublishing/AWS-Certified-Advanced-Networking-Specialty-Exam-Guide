@@ -1,0 +1,150 @@
+{
+"Description" : "Example Chapter 10: A Simple VPC template with two public and two private VPCs. A NACL permits only MySQL traffic in andd out of the private networks",
+"Resources" : {
+      "simpleVPC" : {
+        "Type" : "AWS::EC2::VPC",
+        "Properties" : {
+            "CidrBlock" : "10.0.0.0/22",
+            "Tags" : [ {"Key" : "purpose", "Value" : "demo"} ]
+        }
+      },
+      "PublicSubnetOne" : {
+         "Type" : "AWS::EC2::Subnet",
+		 "DependsOn" : "simpleVPC",
+         "Properties" : {
+            "VpcId" : { "Ref" : "simpleVPC" },
+            "CidrBlock" : "10.0.0.0/24",
+            "AvailabilityZone" : "us-east-2a",
+            "Tags" : [ {"Key" : "purpose", "Value" : "demo"} ]
+         }
+      },
+      "PublicSubnetTwo" : {
+         "Type" : "AWS::EC2::Subnet",
+		 "DependsOn" : "simpleVPC",
+         "Properties" : {
+            "VpcId" : { "Ref" : "simpleVPC" },
+            "CidrBlock" : "10.0.1.0/24",
+            "AvailabilityZone" : "us-east-2b",
+            "Tags" : [ {"Key" : "purpose", "Value" : "demo"} ]
+         }
+      },
+      "simpleInternetGateway" : {
+         "Type" : "AWS::EC2::InternetGateway",
+         "DependsOn" : "simpleVPC",
+		 "Properties" : {
+             "Tags" : [ {"Key" : "purpose", "Value" : "demo"}]
+         }
+      },
+	  "AttachIGW" : {
+		 "Type" : "AWS::EC2::VPCGatewayAttachment",
+		 "DependsOn" : "simpleInternetGateway",
+		 "Properties" : {
+			 "VpcId" : { "Ref" : "simpleVPC" },
+			 "InternetGatewayId" : { "Ref" : "simpleInternetGateway" }
+		}
+	  },
+      "simpleRouteTable" : {
+         "Type" : "AWS::EC2::RouteTable",
+         "DependsOn" : "simpleVPC",
+		 "Properties" : {
+             "VpcId" : { "Ref" : "simpleVPC" },
+             "Tags" : [ {"Key" : "purpose", "Value" : "demo"} ]
+         }
+      },
+      "PublicRoute" : {
+         "Type" : "AWS::EC2::Route",
+         "DependsOn" : "AttachIGW",
+         "Properties" : {
+             "RouteTableId" : { "Ref" : "simpleRouteTable" },
+             "DestinationCidrBlock" : "0.0.0.0/0",
+             "GatewayId" : { "Ref" : "simpleInternetGateway" }
+         }
+      },
+	  "RouteTableAssociationOne" : {
+		 "Type" : "AWS::EC2::SubnetRouteTableAssociation",
+		 "DependsOn" : "simpleRouteTable",
+		 "Properties" : {
+			 "SubnetId" : { "Ref" : "PublicSubnetOne" },
+			 "RouteTableId" : { "Ref" : "simpleRouteTable" }
+		}
+	  },
+	  "RouteTableAssociationTwo" : {
+		 "Type" : "AWS::EC2::SubnetRouteTableAssociation",
+		 "DependsOn" : "simpleRouteTable",
+		 "Properties" : {
+			 "SubnetId" : { "Ref" : "PublicSubnetTwo" },
+			 "RouteTableId" : { "Ref" : "simpleRouteTable" }
+		}
+	  },
+      "PrivateSubnetOne" : {
+         "Type" : "AWS::EC2::Subnet",
+         "DependsOn" : "simpleVPC",
+		 "Properties" : {
+            "VpcId" : { "Ref" : "simpleVPC" },
+            "CidrBlock" : "10.0.2.0/24",
+            "AvailabilityZone" : "us-east-2a",
+            "Tags" : [ {"Key" : "purpose", "Value" : "demo"} ]
+         }
+      },
+      "PrivateSubnetTwo" : {
+         "Type" : "AWS::EC2::Subnet",
+         "DependsOn" : "simpleVPC",
+		 "Properties" : {
+            "VpcId" : { "Ref" : "simpleVPC" },
+            "CidrBlock" : "10.0.3.0/24",
+            "AvailabilityZone" : "us-east-2b",
+            "Tags" : [ {"Key" : "purpose", "Value" : "demo"} ]
+         }
+      },
+      "PrivateSubnetACL" : {
+         "Type" : "AWS::EC2::NetworkAcl",
+         "DependsOn" : "simpleVPC",
+		 "Properties" : {
+            "VpcId" : { "Ref" : "simpleVPC" },
+            "Tags" : [ {"Key" : "purpose", "Value" : "demo"} ]
+         } 
+      },
+      "PrivateSubnetACLIn" : {
+         "Type" : "AWS::EC2::NetworkAclEntry",
+         "DependsOn" : "PrivateSubnetACL",
+		 "Properties" : {
+            "NetworkAclId" : { "Ref" : "PrivateSubnetACL" },
+            "RuleNumber" : "10",
+            "Protocol" : "6",
+            "RuleAction" : "allow",
+            "Egress" : "false",
+            "PortRange" : { "From" : "3306", "To" : "3306" },
+            "CidrBlock" : "10.0.0.0/22"
+         }
+      },
+	  "PrivateSubnetACLOut" : {
+         "Type" : "AWS::EC2::NetworkAclEntry",
+         "DependsOn" : "PrivateSubnetACL",
+		 "Properties" : {
+            "NetworkAclId" : { "Ref" : "PrivateSubnetACL" },
+            "RuleNumber" : "10",
+            "Protocol" : "6",
+            "RuleAction" : "allow",
+            "Egress" : "true",
+            "PortRange" : { "From" : "1024", "To" : "65535" },
+            "CidrBlock" : "10.0.0.0/22"
+         }
+      },
+      "PrivateSubnetOneACLAssociation" : {
+         "Type" : "AWS::EC2::SubnetNetworkAclAssociation",
+         "DependsOn" : "PrivateSubnetOne",
+		 "Properties" : {
+             "SubnetId" : { "Ref" : "PrivateSubnetOne" },
+             "NetworkAclId" : { "Ref" : "PrivateSubnetACL" }
+         }
+      },
+      "PrivateSubnetTwoACLAssociation" : {
+         "Type" : "AWS::EC2::SubnetNetworkAclAssociation",
+         "DependsOn" : "PrivateSubnetTwo",
+		 "Properties" : {
+             "SubnetId" : { "Ref" : "PrivateSubnetTwo" },
+             "NetworkAclId" : { "Ref" : "PrivateSubnetACL" }
+         }
+      }
+   }
+}

@@ -1,0 +1,40 @@
+## Example creation policy
+
+{
+"WaitCondition" : {
+    "Type" : "AWS::CloudFormation::WaitCondition",
+    "CreationPolicy" : {
+        "ResourceSignal" : {
+            "Timeout" : "PT30M",
+            "Count" : "10"
+        }
+    }
+}
+
+## Example Deletion policy
+
+{
+  "Resources" : {
+    "myRDSdb" : {
+      "Type" : "AWS::RDS::DBInstance",
+      "DeletionPolicy" : "Snapshot"
+    }
+  }
+}
+
+## Example DependsON attribure
+
+{
+"Resources" : {
+        "myEC2" : {
+            "Type" : "AWS::EC2::Instance",
+            "Properties" : {
+                "ImageId": "ami-1234wxyz",
+                }
+            },
+            "DependsOn" : "myDB"
+    }
+  }
+}
+ 
+
