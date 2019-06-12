@@ -56,7 +56,7 @@ We also provide a PDF file that has color images of the screenshots/diagrams use
 **Marko Sluga**
 has had the opportunity to work in computing at a very exciting time and has been privileged enough to witness the rise of cloud computing in the last 20 years. Beginning his career as a service technician, he excelled at solving difficult problems. He worked his way up the IT food chain to work on servers, operating systems, virtualization, and the cloud. In the past, Marko has architected numerous cloud computing solutions, and today works as a cloud technology consultant and an Authorized Amazon Instructor. He is AWS-certified, holding the Architect, SysOps, and Developer Associate AWS certifications, the DevOps and Architect Professional AWS certification, and the Security, Advanced Networking, and Big Data Specialty AWS certifications.
 
-## Other books by the authors
+## Another book by the authors
 AWS Certified SysOps Administrator - Associate Guide  [[Packt]](https://www.packtpub.com/virtualization-and-cloud/aws-certified-sysops-administrator-associate-guide?utm_source=github&utm_medium=repository&utm_campaign=9781788990776) [[Amazon]](https://www.amazon.com/dp/1788990773)
 
 ### Suggestions and Feedback
